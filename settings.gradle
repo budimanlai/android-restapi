@@ -1,0 +1,3 @@
+include ':restapi'
+include ':example'
+rootProject.name = "RestAPI"
