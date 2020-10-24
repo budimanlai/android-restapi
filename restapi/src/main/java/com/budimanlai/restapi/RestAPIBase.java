@@ -29,6 +29,7 @@ public class RestAPIBase {
     protected RequestQueue mRequestQueue;
     protected ImageLoader mImageLoader;
     protected Map<String, String> mHeaders;
+    protected RestAPIListenerInterface mListener;
 
     public RestAPIBase(Context context) {
         init(context, "");
@@ -130,6 +131,15 @@ public class RestAPIBase {
         mDebug = debug;
     }
 
+    public void setListener(RestAPIListenerInterface listener) {
+        mListener = listener;
+    }
+
+    public RestAPIListenerInterface getListener() {
+        if (mListener == null) { mListener = new RestAPIJSONListener(); }
+        return mListener;
+    }
+
     /**
      * Show the log message to logcat if mdebug is on (true)
      *
@@ -145,16 +155,20 @@ public class RestAPIBase {
      * @param url String
      * @param params Map<String, String> params
      */
-    protected void postRawJSON(final String url, final JSONObject params, String tag, final RestAPIListenerInterface listener, final RestAPIResponseHandler handler) {
+    protected void stringRequest(int method, final String url, final JSONObject params, String tag, final RestAPIListenerInterface listener, final RestAPIResponseInterface handler) {
+        log("URL: " + url);
+        log("Params: " + params.toString());
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(method, getUrl(url), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                log("onResponse: " + response);
                 listener.onSuccessHandler(response, handler);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                log("onError: " + error.getMessage());
                 listener.onErrorHandler(error, handler);
             }
         }) {
@@ -174,5 +188,37 @@ public class RestAPIBase {
         };
 
         this.addToRequestQueue(stringRequest, tag);
+    }
+
+    public String getUrl(String url) {
+        return mBaseUrl + url;
+    }
+
+    public void postJSON(String url, JSONObject params, String tag, RestAPIListenerInterface listener, RestAPIResponseInterface handler) {
+        stringRequest(Request.Method.POST, url, params, tag, listener, handler);
+    }
+
+    public void postJSON(String url, JSONObject params, RestAPIResponseInterface handler) {
+        stringRequest(Request.Method.POST, url, params, "post_json_request", getListener(), handler);
+    }
+
+    public void postJSON(String url, Map<String, String> params, RestAPIResponseInterface handler) {
+        stringRequest(Request.Method.POST, url, new JSONObject(params), "post_json_request", getListener(), handler);
+    }
+
+    public void get(String url, JSONObject params, String tag, RestAPIListenerInterface listener, RestAPIResponseInterface handler) {
+        stringRequest(Request.Method.GET, url, params, tag, listener, handler);
+    }
+
+    public void get(String url, JSONObject params, RestAPIResponseInterface handler) {
+        stringRequest(Request.Method.GET, url, params, "post_json_request", getListener(), handler);
+    }
+
+    public void get(String url, Map<String, String> params, RestAPIResponseInterface handler) {
+        stringRequest(Request.Method.GET, url, new JSONObject(params), "post_json_request", getListener(), handler);
+    }
+
+    public void get(String url, RestAPIResponseInterface handler) {
+        stringRequest(Request.Method.GET, url, new JSONObject(), "post_json_request", getListener(), handler);
     }
 }

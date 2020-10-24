@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">RestAPI</string>
+    <string name="app_name">RestAPI Example</string>
+
+    <!-- Login Page -->
+    <string name="title_btnLogin">Login</string>
+    <string name="title_username">Username</string>
+    <string name="title_password">Password</string>
+    <string name="title_register">Register</string>
+
+    <string name="base_url">http://192.168.0.103/projects/budimanlai/tools/demo/</string>
 </resources>

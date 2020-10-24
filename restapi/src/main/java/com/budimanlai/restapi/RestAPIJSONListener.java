@@ -10,25 +10,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 public class RestAPIJSONListener implements RestAPIListenerInterface {
     @Override
-    public void onSuccessHandler(String response, RestAPIResponseHandler handler) {
+    public void onSuccessHandler(String response, RestAPIResponseInterface handler) {
         try {
             JSONObject jsonObject = new JSONObject(response);
 
             if (jsonObject.getBoolean("success")) {
-                Object object = jsonObject.get("data");
-                if (object instanceof JSONObject) {
-                    handler.onSuccess((JSONObject) object, jsonObject.toString());
-                } else if (object instanceof JSONArray) {
-                    handler.onSuccess((JSONArray) object, jsonObject.toString());
-                } else {
-                    handler.onError("Data format must is JSON Object or JSON Array", jsonObject);
-                }
+                handler.onSuccess(jsonObject, jsonObject.toString());
             } else {
+                Log.d("TAG", "Error");
                 handler.onError(jsonObject.getString("message"), jsonObject);
             }
         } catch (JSONException e) {
@@ -37,7 +30,7 @@ public class RestAPIJSONListener implements RestAPIListenerInterface {
     }
 
     @Override
-    public void onErrorHandler(VolleyError error,  RestAPIResponseHandler handler) {
+    public void onErrorHandler(VolleyError error,  RestAPIResponseInterface handler) {
         String msgError = "";
         JSONObject jsonObject = null;
 
@@ -58,6 +51,8 @@ public class RestAPIJSONListener implements RestAPIListenerInterface {
                         jsonObject = null;
                         msgError = e.getMessage();
                     }
+                } else {
+                    msgError = "Invalid JSON format response";
                 }
             } else {
                 msgError = error.getMessage();
