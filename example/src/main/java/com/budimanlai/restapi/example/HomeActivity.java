@@ -31,7 +31,7 @@ public class HomeActivity extends MyAppCompatActivity {
         rvCountry.setLayoutManager(new LinearLayoutManager(this));
         rvCountry.setAdapter(adapter);
 
-        MyApplication.getInstance().api.getJSON("country", new RestAPIResponseHandler(){
+        MyApplication.getInstance().api.get("country", new RestAPIResponseHandler(){
             @Override
             public void onSuccess(JSONObject jsonObject, String jsonString) {
                 try {
